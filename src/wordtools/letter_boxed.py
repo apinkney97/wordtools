@@ -51,7 +51,7 @@ def letter_boxed(
         if max_len > 0 and len(current) >= max_len:
             break
         curr_letters = set(itertools.chain(*current))
-        for word in words_by_start[current[-1][-1]]:
+        for word in words_by_start.get(current[-1][-1], []):
             chain = current + [word]
             if curr_letters.union(set(word)) == letters:
                 if max_len == 0:

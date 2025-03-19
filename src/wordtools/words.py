@@ -103,6 +103,7 @@ class WordBag(Collection[str]):
 
     Words can be added or permanently ignored.
     """
+
     def __init__(
         self,
         includes: Collection[str] | None = None,
