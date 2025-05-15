@@ -4,7 +4,8 @@ import typer
 
 from wordtools.anagrams import Anagrammer, AnagramOptions
 from wordtools.letter_boxed import letter_boxed
-from wordtools.wordle import _get_candidates, parse_input
+from wordtools.spelling_bee import spelling_bee
+from wordtools.wordle import _get_candidates, parse_input, summarise
 from wordtools.words import DEFAULT_WORD_LISTS, DefaultWordList, LengthGrouper, WordBag
 
 app = typer.Typer()
@@ -27,7 +28,7 @@ word_list_option = Annotated[DefaultWordList, typer.Option("--dictionary", "-d")
 @app.command()
 def anagram(
     phrase: Annotated[str, typer.Argument()],
-    word_list: word_list_option = DefaultWordList.MEDIUM,
+    word_list: word_list_option = DefaultWordList.LARGE,
     max_words: max_words_option = 0,
     min_words: min_words_option = 0,
     max_word_length: max_word_length_option = 0,
@@ -54,7 +55,7 @@ def anagram(
 @app.command("letter-boxed")
 def _letter_boxed(
     sides: Annotated[list[str], typer.Argument()],
-    word_list: word_list_option = DefaultWordList.MEDIUM,
+    word_list: word_list_option = DefaultWordList.LARGE,
     min_word_length: min_word_length_option = 3,
     max_chain: int = 0,
 ) -> None:
@@ -82,7 +83,7 @@ def wordle(
         typer.Argument(),
     ],
     word_list: word_list_option = DefaultWordList.MEDIUM,
-):
+) -> None:
     words = WordBag(includes=DEFAULT_WORD_LISTS[word_list])
     by_length = LengthGrouper(words)
 
@@ -94,6 +95,26 @@ def wordle(
         candidates = _get_candidates(guess_, candidates)
     for candidate in candidates:
         print(candidate)
+
+    print()
+    print(summarise(candidates))
+
+
+@app.command("spelling-bee")
+def _spelling_bee(
+    letters: Annotated[str, typer.Argument()],
+    required_letter: Annotated[str, typer.Argument()],
+    word_list: word_list_option = DefaultWordList.LARGE,
+) -> None:
+    words = WordBag(includes=DEFAULT_WORD_LISTS[word_list])
+    solutions = spelling_bee(
+        words=words, letters=letters, required_letter=required_letter
+    )
+    for score in sorted(solutions, reverse=True):
+        print(f"===== {score} =====")
+        for word in sorted(solutions[score]):
+            print(word)
+        print()
 
 
 def main() -> None:

@@ -1,4 +1,6 @@
+import collections
 import enum
+import itertools
 import string
 from typing import NamedTuple
 
@@ -102,3 +104,14 @@ def matches_exact_count(
         if word.count(letter) != count:
             return False
     return True
+
+
+def summarise(candidates: list[str]) -> str:
+    counter = collections.Counter(itertools.chain(*candidates))
+    lines: list[str] = []
+    for count, letter in sorted(
+        ((count, letter) for letter, count in counter.items()), reverse=True
+    ):
+        lines.append(f"  {letter}: {count}")
+
+    return "\n".join(lines)

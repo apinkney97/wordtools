@@ -178,7 +178,10 @@ class WordGrouper[T: Hashable](abc.ABC):
         return key in self._groups
 
     def get_group(self, word: str) -> list[str]:
-        return sorted(self._groups.get(self.group_key(word), []))
+        return self.get_group_by_key(self.group_key(word))
+
+    def get_group_by_key(self, key: T) -> list[str]:
+        return sorted(self._groups.get(key, []))
 
     def __getitem__(self, word: str) -> list[str]:
         return self.get_group(word)
