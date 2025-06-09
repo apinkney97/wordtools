@@ -6,7 +6,7 @@ from wordtools.anagrams import Anagrammer, AnagramOptions
 from wordtools.letter_boxed import letter_boxed
 from wordtools.spelling_bee import spelling_bee
 from wordtools.wordle import _get_candidates, parse_input, summarise
-from wordtools.words import DEFAULT_WORD_LISTS, DefaultWordList, LengthGrouper, WordBag
+from wordtools.words import DefaultWordList, LengthGrouper, WordBag, get_default_words
 
 app = typer.Typer()
 
@@ -36,7 +36,7 @@ def anagram(
     include_word: include_word_option = None,
     exclude_word: exclude_word_option = None,
 ) -> None:
-    words = WordBag(includes=DEFAULT_WORD_LISTS[word_list])
+    words = WordBag(includes=get_default_words(word_list))
     anagrammer = Anagrammer(words)
 
     options = AnagramOptions(
@@ -59,7 +59,7 @@ def _letter_boxed(
     min_word_length: min_word_length_option = 3,
     max_chain: int = 0,
 ) -> None:
-    words = WordBag(includes=DEFAULT_WORD_LISTS[word_list], min_length=min_word_length)
+    words = WordBag(includes=get_default_words(word_list), min_length=min_word_length)
 
     for solution in sorted(
         (" ".join(sol) for sol in letter_boxed(words, *sides, max_len=max_chain)),
@@ -84,7 +84,7 @@ def wordle(
     ],
     word_list: word_list_option = DefaultWordList.MEDIUM,
 ) -> None:
-    words = WordBag(includes=DEFAULT_WORD_LISTS[word_list])
+    words = WordBag(includes=get_default_words(word_list))
     by_length = LengthGrouper(words)
 
     parsed_input = [parse_input(g) for g in guess]
@@ -104,9 +104,9 @@ def wordle(
 def _spelling_bee(
     letters: Annotated[str, typer.Argument()],
     required_letter: Annotated[str, typer.Argument()],
-    word_list: word_list_option = DefaultWordList.LARGE,
+    word_list: word_list_option = DefaultWordList.ALL,
 ) -> None:
-    words = WordBag(includes=DEFAULT_WORD_LISTS[word_list])
+    words = WordBag(includes=get_default_words(word_list))
     solutions = spelling_bee(
         words=words, letters=letters, required_letter=required_letter
     )

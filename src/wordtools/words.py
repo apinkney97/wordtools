@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import abc
 import enum
+import itertools
 import json
 from collections.abc import Collection, Hashable, Iterator
 
@@ -65,6 +68,11 @@ class RawWordList(Collection[str]):
 
         self._loaded = True
 
+    @property
+    def words(self) -> list[str]:
+        self._load()
+        return self._words[:]
+
     def __iter__(self) -> Iterator[str]:
         self._load()
         yield from self._words
@@ -82,6 +90,7 @@ class DefaultWordList(enum.StrEnum):
     SMALL = enum.auto()
     MEDIUM = enum.auto()
     LARGE = enum.auto()
+    ALL = enum.auto()
 
 
 DEFAULT_WORD_LISTS = {
@@ -95,6 +104,13 @@ DEFAULT_WORD_LISTS = {
         url="https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt"
     ),
 }
+
+
+def get_default_words(list_type: DefaultWordList) -> list[str]:
+    if list_type is DefaultWordList.ALL:
+        return list(itertools.chain(*(DEFAULT_WORD_LISTS.values())))
+
+    return DEFAULT_WORD_LISTS[list_type].words
 
 
 class WordBag(Collection[str]):
@@ -129,6 +145,10 @@ class WordBag(Collection[str]):
             return
 
         self._words.add(word)
+
+    def add_words(self, words: Collection[str]) -> None:
+        for word in words:
+            self.add_word(word)
 
     def exclude_word(self, word: str) -> None:
         if word in self._excluded:

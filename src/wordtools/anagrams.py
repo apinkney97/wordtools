@@ -8,7 +8,7 @@ import unidecode
 
 from wordtools.words import WordGrouper
 
-KeyType = tuple[str, ...]
+type KeyType = tuple[str, ...]
 
 
 @dataclasses.dataclass

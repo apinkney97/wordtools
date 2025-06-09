@@ -32,4 +32,4 @@ extend-select = ["I"]
 
 [tool.mypy]
 strict = true
-packages = ["wordtools"]
+files = ["src"]
